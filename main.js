@@ -1,8 +1,8 @@
 const puppeteer = require('puppeteer');
 
-const DATA = "10/04"
-
-const horas = (8 * 60 + 48) * 0.5; // Calcula 60% de 8:48 em minutos
+const DATA = "14/04"
+const ADVERSARIO = 'atletico-mg';
+const COMPETICAO = 'br24';
 
 (async () => {
     // Create a browser instance
@@ -42,11 +42,24 @@ async function FillForm(page) {
 
    await page.waitForTimeout(1000);
 
-   await page.goto('https://www.fieltorcedor.com.br/jogos/corinthians-x-sampaio-correa-lbf24/categoria/');
+   await page.goto(`https://www.fieltorcedor.com.br/jogos/corinthians-x-${ADVERSARIO}-${COMPETICAO}/categoria/`);
 
    const btn = await page.$x(`//p[contains(text(), 'Comprar')]`);
    await btn[0].click();
+
    await page.waitForNavigation();
+
+   const gTags = await page.$$('g');
+   gTags.forEach(async gTag => {
+    console.log(gTag.classList)
+    if (!gTag.classList.contains('disabled')) {
+      const link = gTag.parentElement;
+      if (link.tagName === 'a') {
+        link.click();
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 1 second for navigation to complete
+      }
+    }
+   });
 
     // await page.waitForTimeout(2000);
 
@@ -96,7 +109,5 @@ async function Login(page, website_url) {
     await password[0].type('Cesar@010203');
 
 
-    await page.waitForTimeout(5000);
-    await page.click('button[type="submit"]');
     await page.waitForNavigation();
 }
