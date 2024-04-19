@@ -1,9 +1,8 @@
 const puppeteer = require('puppeteer');
 
-const DATA = "22/04"
 const ADVERSARIO = 'ferroviaria';
 const COMPETICAO = 'brfm24';
-const SETOR = 'sul';
+const SETOR = 'leste-inferior-central';
 
 (async () => {
   // Create a browser instance
@@ -21,12 +20,8 @@ const SETOR = 'sul';
   // Open URL in current page
   await Login(page, website_url);
 
-  await FillForm(page, website_url);
+  await FillForm(page, browser);
 
-  await GoToIndexEndPrint(website_url, page);
-
-  // Close the browser instance
-  //await browser.close();
 })();
 
 async function preencheCheck(page) {
@@ -38,24 +33,10 @@ async function preencheCheck(page) {
   }
 
   const reservar = await page.$x(`//button[contains(text(), 'Reservar')]`);
-  await page.waitForTimeout(100);
-  await reservar[0].click();
-
-  await page.waitForNavigation();
-}
-async function FillForm(page) {
-  // Find the label with text "09/04"
-  const label = await page.$x(`//label[contains(text(), '${DATA}')]`);
-
-  // If the label is found, click on it
-  if (label.length > 0) {
-    await label[0].click();
-    console.log("Clicked on label ", DATA);
-  } else {
-    console.log("not found", DATA);
-  }
-
   await page.waitForTimeout(1000);
+  await reservar[0].click();
+}
+async function FillForm(page, browser) {
 
   await page.goto(`https://www.fieltorcedor.com.br/jogos/corinthians-x-${ADVERSARIO}-${COMPETICAO}/categoria/`);
 
@@ -74,25 +55,17 @@ async function FillForm(page) {
 
   await preencheCheck(page);
 
-  const url = page.url()
+  await page.waitForNavigation();
 
-  console.log(url)
+  let url = page.url()
 
-  if (url == `https://www.fieltorcedor.com.br/jogos/corinthians-x-${ADVERSARIO}-${COMPETICAO}/setor/${SETOR}/`) {
-    await page.waitForTimeout(1000);
+  while (url == `https://www.fieltorcedor.com.br/jogos/corinthians-x-${ADVERSARIO}-${COMPETICAO}/setor/${SETOR}/`) {
     await preencheCheck(page);
-  } else {
-    await browser.close()
+    await page.waitForNavigation();
+    url = page.url()
   }
-}
-
-async function GoToIndexEndPrint(website_url, page) {
-
-
-  await page.screenshot({
-    path: 'screenshot.jpg',
-  });
-}
+  await browser.close();
+};
 
 async function Login(page, website_url) {
   await page.goto(website_url);
