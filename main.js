@@ -1,113 +1,108 @@
 const puppeteer = require('puppeteer');
 
-const DATA = "14/04"
-const ADVERSARIO = 'atletico-mg';
-const COMPETICAO = 'br24';
+const DATA = "22/04"
+const ADVERSARIO = 'ferroviaria';
+const COMPETICAO = 'brfm24';
+const SETOR = 'sul';
 
 (async () => {
-    // Create a browser instance
-    console.log("Create a browser instance")
-    const browser = await puppeteer.launch({ headless: false })
+  // Create a browser instance
+  console.log("Create a browser instance")
+  const browser = await puppeteer.launch({ headless: false })
 
-    // Create a new page
-    const page = await browser.newPage();
+  // Create a new page
+  const page = await browser.newPage();
 
-    // Set viewport width and height
-    await page.setViewport({ width: 1280, height: 720 });
+  // Set viewport width and height
+  await page.setViewport({ width: 1280, height: 720 });
 
-    const website_url = `https://www.fieltorcedor.com.br/auth/login/`;
+  const website_url = `https://www.fieltorcedor.com.br/auth/login/`;
 
-    // Open URL in current page
-    await Login(page, website_url);
+  // Open URL in current page
+  await Login(page, website_url);
 
-    await FillForm(page, website_url);
+  await FillForm(page, website_url);
 
-    await GoToIndexEndPrint(website_url, page);
+  await GoToIndexEndPrint(website_url, page);
 
-    // Close the browser instance
-    //await browser.close();
+  // Close the browser instance
+  //await browser.close();
 })();
 
+async function preencheCheck(page) {
+  const checkboxes = await page.$$('input[type="checkbox"]');
+
+  for (const checkbox of checkboxes) {
+    await checkbox.click();
+    console.log("Clicked on checkbox:", await checkbox.evaluate(input => input.getAttribute('id')));
+  }
+
+  const reservar = await page.$x(`//button[contains(text(), 'Reservar')]`);
+  await page.waitForTimeout(100);
+  await reservar[0].click();
+
+  await page.waitForNavigation();
+}
 async function FillForm(page) {
-   // Find the label with text "09/04"
-   const label = await page.$x(`//label[contains(text(), '${DATA}')]`);
+  // Find the label with text "09/04"
+  const label = await page.$x(`//label[contains(text(), '${DATA}')]`);
 
-   // If the label is found, click on it
-   if (label.length > 0) {
-     await label[0].click();
-     console.log("Clicked on label ", DATA);
-   } else {
-     console.log("not found", DATA);
-   }
+  // If the label is found, click on it
+  if (label.length > 0) {
+    await label[0].click();
+    console.log("Clicked on label ", DATA);
+  } else {
+    console.log("not found", DATA);
+  }
 
-   await page.waitForTimeout(1000);
+  await page.waitForTimeout(1000);
 
-   await page.goto(`https://www.fieltorcedor.com.br/jogos/corinthians-x-${ADVERSARIO}-${COMPETICAO}/categoria/`);
+  await page.goto(`https://www.fieltorcedor.com.br/jogos/corinthians-x-${ADVERSARIO}-${COMPETICAO}/categoria/`);
 
-   const btn = await page.$x(`//p[contains(text(), 'Comprar')]`);
-   await btn[0].click();
+  const comprar = await page.$x(`//p[contains(text(), 'Comprar')]`);
+  await comprar[0].click();
 
-   await page.waitForNavigation();
+  await page.waitForNavigation();
 
-   const gTags = await page.$$('g');
-   gTags.forEach(async gTag => {
-    console.log(gTag.classList)
-    if (!gTag.classList.contains('disabled')) {
-      const link = gTag.parentElement;
-      if (link.tagName === 'a') {
-        link.click();
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 1 second for navigation to complete
-      }
-    }
-   });
+  await page.goto(`https://www.fieltorcedor.com.br/jogos/corinthians-x-${ADVERSARIO}-${COMPETICAO}/setor/${SETOR}/modo-de-compra/`);
 
-    // await page.waitForTimeout(2000);
+  const prosseguir = await page.$x(`//button[contains(text(), 'Prosseguir')]`);
+  await prosseguir[0].click();
 
-    // const ddlProjeto = await page.$$('select[id*="_ddlProjeto"]');
-    // await ddlProjeto[0].type('391');
 
-    // const ddlEntregavel = await page.$$('select[id*="_ddlEntregavel"]');
-    // await ddlEntregavel[0].type('15099');
+  await page.waitForNavigation();
 
-    // const ddlAtividade = await page.$$('select[id*="_ddlAtividade"]');
-    // await ddlAtividade[0].type('2');
+  await preencheCheck(page);
 
-    // const horasFormatadas = `${String(Math.floor(horas / 60)).padStart(2, '0')}:${String(Math.round(horas % 60)).padStart(2, '0')}`;
+  const url = page.url()
 
-    // await page.evaluate(({ horasFormatadas }) => {
-    //     const example = document.querySelector('input[id*="_txtHoras"]');
-    //     example.value = horasFormatadas;
-    // }, { horasFormatadas });
+  console.log(url)
 
-    // await page.click('input[id$="_btnAdicionar"]');
-
-    // await page.waitForTimeout(1000);
-
-    // await page.click('input[id$="_btnSalvar"]');
-
-    // await page.keyboard.down('Space');
-    // await page.keyboard.up('Space');
-
-    // await page.waitForTimeout(5000);
+  if (url == `https://www.fieltorcedor.com.br/jogos/corinthians-x-${ADVERSARIO}-${COMPETICAO}/setor/${SETOR}/`) {
+    await page.waitForTimeout(1000);
+    await preencheCheck(page);
+  } else {
+    await browser.close()
+  }
 }
 
 async function GoToIndexEndPrint(website_url, page) {
 
 
-    await page.screenshot({
-        path: 'screenshot.jpg',
-    });
+  await page.screenshot({
+    path: 'screenshot.jpg',
+  });
 }
 
 async function Login(page, website_url) {
-    await page.goto(website_url);
+  await page.goto(website_url);
 
-    const userName = await page.$$('input[name*="username"]');
-    await userName[0].type('12084100836');
+  const userName = await page.$$('input[name*="username"]');
+  await userName[0].type('12084100836');
 
-    const password = await page.$$('input[name*="password"]');
-    await password[0].type('Cesar@010203');
+  const password = await page.$$('input[name*="password"]');
+  await password[0].type('Cesar@010203');
 
 
-    await page.waitForNavigation();
+  await page.waitForNavigation();
 }
