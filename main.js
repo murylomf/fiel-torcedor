@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 
-const ADVERSARIO = 'ferroviaria';
-const COMPETICAO = 'brfm24';
+const ADVERSARIO = 'fluminense';
+const COMPETICAO = 'br24';
 const SETOR = 'leste-inferior-central';
 
 (async () => {
