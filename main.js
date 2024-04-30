@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 
-const ADVERSARIO = 'fluminense';
+const ADVERSARIO = 'fortaleza';
 const COMPETICAO = 'br24';
 const SETOR = 'leste-inferior-central';
 
