@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 
 const ADVERSARIO = 'fortaleza';
 const COMPETICAO = 'br24';
-const SETOR = 'leste-inferior-central';
+const SETOR = 'sul';
 
 (async () => {
     // Create a browser instance
@@ -40,42 +40,42 @@ async function preencheCheck(page) {
 
     await page.waitForTimeout(1000);
 
-    await page.evaluate(() => {
-        const reservarButton = document.querySelector('button:contains("Reservar")');
-        reservarButton.click();
-    });
+    await getByName(page, 'button', 'Reservar');
+}
+
+async function getByName(page, tag, text) {
+    const elements = await page.$$(tag);
+
+    for (const element of elements) {
+        const elementText = await page.evaluate(el => el.textContent, element);
+        if (elementText.includes(text)) {
+            await element.click();
+            console.log("Clicked on element containing ", text);
+            await page.waitForNavigation();
+        }
+    }
 }
 
 async function FillForm(page, browser) {
     await page.goto(`https://www.fieltorcedor.com.br/jogos/corinthians-x-${ADVERSARIO}-${COMPETICAO}/categoria/`);
 
-    await page.evaluate(() => {
-        const comprarButton = document.querySelector('p:contains("Comprar")');
-        comprarButton.click();
-    });
-
+    //await getByName(page, 'p', 'Comprar');
     await page.waitForNavigation();
 
-    await page.goto(`https://www.fieltorcedor.com.br/jogos/corinthians-x-${ADVERSARIO}-${COMPETICAO}/setor/${SETOR}/modo-de-compra/`);
-
-    await page.evaluate(() => {
-        const prosseguirButton = document.querySelector('button:contains("Prosseguir")');
-        prosseguirButton.click();
-    });
-
-    await page.waitForNavigation();
+    await getByName(page, 'button', 'Prosseguir');
 
     await preencheCheck(page);
 
     await page.waitForNavigation();
 
-    let url = page.url()
+    let url = page.url();
 
-    while (url == `https://www.fieltorcedor.com.br/jogos/corinthians-x-${ADVERSARIO}-${COMPETICAO}/setor/${SETOR}/`) {
+    while (url === `https://www.fieltorcedor.com.br/jogos/corinthians-x-${ADVERSARIO}-${COMPETICAO}/setor/${SETOR}/`) {
         await preencheCheck(page);
         await page.waitForNavigation();
-        url = page.url()
+        url = page.url();
     }
+
     await browser.close();
 }
 
@@ -84,11 +84,10 @@ async function Login(page, website_url) {
     await page.goto(website_url);
 
     const userName = await page.$$('input[name*="username"]');
-    await userName[0].type('12084100836');
+    await userName[0].type('34468727870');
 
     const password = await page.$$('input[name*="password"]');
     await password[0].type('Cesar@010203');
-
 
     await page.waitForNavigation();
 }
