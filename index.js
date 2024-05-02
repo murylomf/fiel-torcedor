@@ -3,6 +3,7 @@ const puppeteer = require('puppeteer');
 const ADVERSARIO = 'fortaleza';
 const COMPETICAO = 'br24';
 const SETOR = 'sul';
+var tentativa = 0;
 
 (async () => {
     // Create a browser instance
@@ -35,13 +36,15 @@ async function preencheCheck(page) {
             const checkbox = document.getElementById(id);
             checkbox.click();
         }, checkboxId);
-        console.log("Clicked on checkbox:", checkboxId);
     }
 
     await page.waitForTimeout(1000);
 
     const reservarButton = await page.$('#submit_fieltorcedor_booking_by_dependente_form');
     await reservarButton.click();
+    tentativa++;
+    console.log("Tentativa:", tentativa);
+
     await page.waitForNavigation();
 }
 
