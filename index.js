@@ -40,39 +40,32 @@ async function preencheCheck(page) {
 
     await page.waitForTimeout(1000);
 
-    await getByName(page, 'button', 'Reservar');
-}
-
-async function getByName(page, tag, text) {
-    const elements = await page.$$(tag);
-
-    for (const element of elements) {
-        const elementText = await page.evaluate(el => el.textContent, element);
-        if (elementText.includes(text)) {
-            await element.click();
-            console.log("Clicked on element containing ", text);
-            await page.waitForNavigation();
-        }
-    }
+    const reservarButton = await page.$('#submit_fieltorcedor_booking_by_dependente_form');
+    await reservarButton.click();
+    await page.waitForNavigation();
 }
 
 async function FillForm(page, browser) {
     await page.goto(`https://www.fieltorcedor.com.br/jogos/corinthians-x-${ADVERSARIO}-${COMPETICAO}/categoria/`);
 
-    //await getByName(page, 'p', 'Comprar');
-    await page.waitForNavigation();
+    const comprarButton = await page.$('.btn.btn-link');
+    await comprarButton.click();
+    await page.waitForNavigation(); // vai ir para os setores
 
-    await getByName(page, 'button', 'Prosseguir');
+    await page.goto(`https://www.fieltorcedor.com.br/jogos/corinthians-x-${ADVERSARIO}-${COMPETICAO}/setor/${SETOR}/modo-de-compra/`); // forçar setor
+
+    //await page.waitForNavigation();
+
+    const prosseguirButton = await page.$('.btn.btn-primary');
+    await prosseguirButton.click();
+    await page.waitForNavigation();
 
     await preencheCheck(page);
-
-    await page.waitForNavigation();
 
     let url = page.url();
 
     while (url === `https://www.fieltorcedor.com.br/jogos/corinthians-x-${ADVERSARIO}-${COMPETICAO}/setor/${SETOR}/`) {
         await preencheCheck(page);
-        await page.waitForNavigation();
         url = page.url();
     }
 
