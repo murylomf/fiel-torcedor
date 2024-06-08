@@ -67,7 +67,7 @@ async function FillForm(page, browser) {
 
         await page.goto(`https://www.fieltorcedor.com.br/jogos/corinthians-x-${ADVERSARIO}-${COMPETICAO}/setor/${SETOR}/modo-de-compra/`); // forçar setor
 
-        //await page.waitForNavigation();
+        await page.waitForNavigation();
 
         const prosseguirButton = await page.$('.btn.btn-primary');
         await prosseguirButton.click();
