@@ -1,15 +1,36 @@
 {
-  "name": "provia",
+  "name": "fiel-torcedor",
   "version": "1.0.0",
-  "description": "",
-  "main": "main.js",
+  "main": "index.js",
+  "bin": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "build": "webpack",
+    "start": "node index.js",
+    "start:bot": "node bot.js"
+  },
+  "pkg": {
+    "scripts": [
+      "bot.js"
+    ],
+    "assets": [
+      "node_modules/**/*"
+    ],
+    "targets": [
+      "node18-win-x64",
+      "node18-macos-x64",
+      "node18-linux-x64"
+    ]
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "puppeteer": "^21.9.0"
+    "puppeteer": "^21.9.0",
+    "webpack": "^5.93.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "axios": "^1.7.3",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
   }
 }
